@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+    <head>
+        <link rel="stylesheet" href="./sap_outages/static/display.css">
+        <title>Outage Display System</title>
+    <meta http-equiv="refresh" content="60">
+    </head>
+   <body>
+    <p id="demo"></p>
+    <div id="searchBarWrap">
+        <input id="searchBar" type="text" name="searchbar" onkeyup="myFunction()" placeholder="Search & Explore..."/>
+    </div>
+    <div class="container">
+        <div id="inner">
+            <table style="margin-left: auto; margin-right: auto;">
+                <td>
+                <div style="float: left">
+                    <p>Currently Down Services</p>
+                    {{currently_down | safe}}
+                </div>
+                <div style="float: left">
+                    <p>Recently Down Services</p>
+                    {{recently_down | safe}}
+                </div>
+                <div style="float: left">
+                    <p>Flapping Services</p>
+                    {{flapping | safe}}
+                </div>
+                </td>
+            </table>
+        </div>
+        <div id="clearit"></div>
+    </div>
+     <script>
+        const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
+
+        const comparer = (idx, asc) => (a, b) => ((v1, v2) =>
+        v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2))
+        (getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
+
+        document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
+        const table = th.closest('table');
+        const tbody = table.querySelector('tbody');
+        Array.from(tbody.querySelectorAll('tr'))
+        .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
+        .forEach(tr => tbody.appendChild(tr) );})));
+
+
+        var input = document.getElementById("searchbar");
+        input.addEventListener("keyup", search);
+        input.addEventListener("search", search);
+        var rows = Array.prototype.slice.call(table.querySelectorAll("tr"));
+        function search(){
+            var filter = input.value.trim().toUpperCase();
+            rows.forEach(function(row) {
+                var data = "";
+                Array.prototype.slice.call(row.getElementsByTagName("td")).forEach(function(r){
+                    data += r.textContent;
+                    });
+                if(data.toUpperCase().indexOf(filter) > -1){
+                    row.classList.remove("hidden");
+                    } else {
+                        row.classList.add("hidden");
+                            }
+            });
+
+        }
+    </script>
+   </body>
+</html>
